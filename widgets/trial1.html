@@ -31,6 +31,27 @@
       position: fixed;
       top: 10px;
       right: 10px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #2196F3;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .toggle-button:hover {
+      opacity: 1;
+    }
+
+    .dark-mode {
+      background-color: black;
+      color: white;
+    }
+
+    .light-mode {
+      background-color: white;
+      color: black;
     }
   </style>
 </head>
@@ -40,7 +61,7 @@
     <div id="date"></div>
   </div>
 
-  <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+  <div class="toggle-button" onclick="toggleMode()"></div>
 
   <script>
     function updateTime() {
@@ -63,9 +84,10 @@
     // Update the time every second
     setInterval(updateTime, 1000);
 
-    function toggleDarkMode() {
-      var bodyElement = document.body;
-      bodyElement.classList.toggle('dark-mode');
+    function toggleMode() {
+      var clockElement = document.getElementsByClassName("clock")[0];
+      clockElement.classList.toggle('dark-mode');
+      clockElement.classList.toggle('light-mode');
     }
   </script>
 </body>
