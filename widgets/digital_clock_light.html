@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: serif;
+      transition: background-color 0.5s, color 0.5s;
+    }
+
+    .clock {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgb(255, 255, 255);
+      color: rgb(0, 0, 0);
+      padding-top: 40%;
+      padding-bottom: 40%;
+      padding-left: 30%;
+      padding-right: 30%;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    #time {
+      font-weight: bold;
+    }
+
+    #date {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock">
+    <div id="time"></div>
+    <div id="date"></div>
+  </div>
+
+  <script>
+    function updateTime() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var period = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      var timeString = hours + ':' + addLeadingZero(minutes) + ':' + addLeadingZero(seconds) + ' ' + period;
+
+      document.getElementById('time').textContent = timeString;
+      const monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+      document.getElementById('date').textContent = `${monthName[now.getMonth()]} ${now.getDate()}`
+    }
+
+    function addLeadingZero(value) {
+      return value < 10 ? '0' + value : value;
+    }
+
+    // Update the time every second
+    setInterval(updateTime, 1000);
+
+  </script>
+</body>
+</html>

@@ -8,13 +8,16 @@
     }
 
     .clock {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background-color: black;
       color: white;
-      padding: 20px;
+      padding-top: 40%;
+      padding-bottom: 40%;
+      padding-left: 30%;
+      padding-right: 30%;
       font-size: 24px;
       text-align: center;
     }
@@ -27,32 +30,6 @@
       margin-top: 10px;
     }
 
-    .toggle-button {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background-color: #2196F3;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .toggle-button:hover {
-      opacity: 1;
-    }
-
-    .dark-mode {
-      background-color: black;
-      color: white;
-    }
-
-    .light-mode {
-      background-color: white;
-      color: black;
-    }
   </style>
 </head>
 <body>
@@ -60,8 +37,6 @@
     <div id="time"></div>
     <div id="date"></div>
   </div>
-
-  <div class="toggle-button" onclick="toggleMode()"></div>
 
   <script>
     function updateTime() {
@@ -74,7 +49,9 @@
       var timeString = hours + ':' + addLeadingZero(minutes) + ':' + addLeadingZero(seconds) + ' ' + period;
 
       document.getElementById('time').textContent = timeString;
-      document.getElementById('date').textContent = now.toDateString();
+      const monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+      document.getElementById('date').textContent = `${monthName[now.getMonth()]} ${now.getDate()}`
     }
 
     function addLeadingZero(value) {
@@ -84,11 +61,6 @@
     // Update the time every second
     setInterval(updateTime, 1000);
 
-    function toggleMode() {
-      var clockElement = document.getElementsByClassName("clock")[0];
-      clockElement.classList.toggle('dark-mode');
-      clockElement.classList.toggle('light-mode');
-    }
   </script>
 </body>
 </html>
