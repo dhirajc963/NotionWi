@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      font-family: serif;
+      transition: background-color 0.5s, color 0.5s;
+    }
+
+    .clock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: black;
+      color: white;
+      padding: 20px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    #time {
+      font-weight: bold;
+    }
+
+    #date {
+      margin-top: 10px;
+    }
+
+    .toggle-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="clock">
+    <div id="time"></div>
+    <div id="date"></div>
+  </div>
+
+  <button class="toggle-button" onclick="toggleDarkMode()">Toggle Dark Mode</button>
+
+  <script>
+    function updateTime() {
+      var now = new Date();
+      var hours = now.getHours();
+      var minutes = now.getMinutes();
+      var seconds = now.getSeconds();
+      var period = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      var timeString = hours + ':' + addLeadingZero(minutes) + ':' + addLeadingZero(seconds) + ' ' + period;
+
+      document.getElementById('time').textContent = timeString;
+      document.getElementById('date').textContent = now.toDateString();
+    }
+
+    function addLeadingZero(value) {
+      return value < 10 ? '0' + value : value;
+    }
+
+    // Update the time every second
+    setInterval(updateTime, 1000);
+
+    function toggleDarkMode() {
+      var bodyElement = document.body;
+      bodyElement.classList.toggle('dark-mode');
+    }
+  </script>
+</body>
+</html>
