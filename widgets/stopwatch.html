@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Stopwatch</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--bg-color: #f0f0f0;
+				--text-color: #333;
+				--button-bg: #fff;
+				--button-hover: #ddd;
+				--button-border: #ccc;
+			}
+			[data-theme="dark"] {
+				--bg-color: #333;
+				--text-color: #f0f0f0;
+				--button-bg: #555;
+				--button-hover: #777;
+				--button-border: #666;
+			}
+			body {
+				font-family: "Raleway";
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+				background-color: var(--bg-color);
+				color: var(--text-color);
+				transition: background-color 0.3s, color 0.3s;
+			}
+			.stopwatch {
+				text-align: center;
+				position: relative;
+			}
+			.time {
+				font-size: 3rem;
+				margin-bottom: 20px;
+			}
+			.controls button {
+				font-family: "Raleway";
+				margin: 5px;
+				padding: 10px 20px;
+				font-size: 1rem;
+				background-color: var(--button-bg);
+				color: var(--text-color);
+				border: 1px solid var(--button-border);
+				border-radius: 5px;
+				cursor: pointer;
+				transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+			}
+			.controls button:hover {
+				background-color: var(--button-hover);
+			}
+			.theme-toggle {
+				position: absolute;
+				bottom: -40px;
+				right: 0;
+				display: flex;
+				align-items: center;
+				font-size: 0.9rem;
+			}
+			.slider {
+				margin-left: 10px;
+				width: 40px;
+				height: 20px;
+				position: relative;
+				background-color: var(--button-bg);
+				border: 1px solid var(--button-border);
+				border-radius: 15px;
+				cursor: pointer;
+				transition: background-color 0.3s, border-color 0.3s;
+			}
+			.slider:before {
+				content: "";
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: 16px;
+				height: 16px;
+				background-color: var(--text-color);
+				border-radius: 50%;
+				transition: left 0.3s, background-color 0.3s;
+			}
+			.slider.active {
+				background-color: var(--button-hover);
+			}
+			.slider.active:before {
+				left: 22px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="stopwatch">
+			<div class="time" id="display">00:00:00</div>
+			<div class="controls">
+				<button id="toggle">Start</button>
+				<button id="reset">Reset</button>
+			</div>
+			<div class="theme-toggle">
+				<span>Dark Mode</span>
+				<div id="themeSlider" class="slider"></div>
+			</div>
+		</div>
+
+		<script>
+			let timer,
+				isRunning = false,
+				hours = 0,
+				minutes = 0,
+				seconds = 0;
+
+			const display = document.getElementById("display");
+			const toggleButton = document.getElementById("toggle");
+			const resetButton = document.getElementById("reset");
+			const themeSlider = document.getElementById("themeSlider");
+
+			function updateDisplay() {
+				const format = (num) => (num < 10 ? `0${num}` : num);
+				display.textContent = `${format(hours)}:${format(minutes)}:${format(
+					seconds
+				)}`;
+			}
+
+			function toggleStopwatch() {
+				if (isRunning) {
+					clearInterval(timer);
+					toggleButton.textContent = "Start";
+				} else {
+					timer = setInterval(() => {
+						seconds++;
+						if (seconds === 60) {
+							seconds = 0;
+							minutes++;
+						}
+						if (minutes === 60) {
+							minutes = 0;
+							hours++;
+						}
+						updateDisplay();
+					}, 1000);
+					toggleButton.textContent = "Stop";
+				}
+				isRunning = !isRunning;
+			}
+
+			function resetStopwatch() {
+				clearInterval(timer);
+				isRunning = false;
+				hours = 0;
+				minutes = 0;
+				seconds = 0;
+				updateDisplay();
+				toggleButton.textContent = "Start";
+			}
+
+			function toggleTheme() {
+				const isDark =
+					document.documentElement.getAttribute("data-theme") === "dark";
+				document.documentElement.setAttribute(
+					"data-theme",
+					isDark ? "light" : "dark"
+				);
+				themeSlider.classList.toggle("active", !isDark);
+			}
+
+			toggleButton.addEventListener("click", toggleStopwatch);
+			resetButton.addEventListener("click", resetStopwatch);
+			themeSlider.addEventListener("click", toggleTheme);
+
+			// Initialize display and theme
+			updateDisplay();
+			document.documentElement.setAttribute("data-theme", "light");
+		</script>
+	</body>
+</html>
