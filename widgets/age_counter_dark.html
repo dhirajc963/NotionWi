@@ -10,18 +10,20 @@
 		/>
 		<style>
 			:root {
-				--bg-color: #191919;
-				--text-color: #f0f0f0;
+				--bg-color: #191919; /* Dark background */
+				--text-color: #d4d4d4; /* Light text color */
 				--button-bg: #555;
 				--button-hover: #777;
 				--button-border: #666;
 				--input-bg: #555;
 				--divider-color: #666;
 				--vertical-divider-color: #666;
+				--counter-bg: #222; /* Dark background for the counter section */
+				--shadow-color: rgba(0, 0, 0, 0.4); /* Shadow effect */
 			}
 
 			body {
-				font-family: "Raleway";
+				font-family: "Raleway", sans-serif;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
@@ -38,8 +40,8 @@
 				position: relative;
 				padding: 20px;
 				border-radius: 10px;
-				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-				background-color: var(--bg-color);
+				background-color: var(--counter-bg); /* Counter background */
+				box-shadow: 0 4px 8px var(--shadow-color); /* Subtle shadow */
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -157,7 +159,6 @@
 
 			updateAgeDisplay();
 			timer = setInterval(updateAgeDisplay, 1000);
-			document.documentElement.setAttribute("data-theme", "dark");
 		</script>
 	</body>
 </html>
