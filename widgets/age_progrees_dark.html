@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Birthday Progress Bar</title>
+		<style>
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+				background-color: #1a1a1a;
+				color: #e0e0e0;
+				font-family: Arial, sans-serif;
+			}
+
+			.progress-bar-container {
+				width: 90%;
+				max-width: 600px;
+				height: 30px;
+				background-color: #333;
+				border-radius: 15px;
+				position: relative;
+				overflow: hidden;
+				display: flex;
+			}
+
+			.progress-bar-fill {
+				height: 100%;
+				background-color: #000000; /* Subtle dark fill */
+				width: 0%; /* Dynamically set */
+				transition: width 0.5s ease-in-out;
+				z-index: 1;
+			}
+
+			.progress-partitions {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+				display: flex;
+				z-index: 0;
+			}
+
+			.partition {
+				flex: 1;
+				border-right: 1px solid #272626;
+			}
+
+			.partition:last-child {
+				border-right: none;
+			}
+
+			.progress-text {
+				margin-top: 10px;
+				text-align: center;
+				font-size: 14px;
+				color: #bbb;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="progress-bar-container">
+			<div class="progress-partitions" id="progressPartitions"></div>
+			<div class="progress-bar-fill" id="progressBarFill"></div>
+		</div>
+		<div class="progress-text">
+			<span id="progressPercent">0%</span> completed
+		</div>
+		<script>
+			const birthdate = "1999-11-05";
+			const progressBarFill = document.getElementById("progressBarFill");
+			const progressPartitions = document.getElementById("progressPartitions");
+			const progressPercentText = document.getElementById("progressPercent");
+
+			function calculateProgress(birthdate) {
+				const now = new Date();
+				const [birthYear, birthMonth, birthDay] = birthdate
+					.split("-")
+					.map(Number);
+
+				// Previous and next birthdays
+				const currentYear = now.getFullYear();
+				const thisYearsBirthday = new Date(
+					currentYear,
+					birthMonth - 1,
+					birthDay
+				);
+				const nextYearsBirthday = new Date(
+					currentYear + 1,
+					birthMonth - 1,
+					birthDay
+				);
+
+				const previousBirthday =
+					now >= thisYearsBirthday
+						? thisYearsBirthday
+						: new Date(currentYear - 1, birthMonth - 1, birthDay);
+				const nextBirthday =
+					now >= thisYearsBirthday ? nextYearsBirthday : thisYearsBirthday;
+
+				// Days elapsed and total days
+				const elapsedDays = Math.floor(
+					(now - previousBirthday) / (1000 * 60 * 60 * 24)
+				);
+				const totalDays = Math.floor(
+					(nextBirthday - previousBirthday) / (1000 * 60 * 60 * 24)
+				);
+				const progress = (elapsedDays / totalDays) * 100;
+
+				return { progress, elapsedDays, totalDays };
+			}
+
+			function createPartitions(totalDays) {
+				progressPartitions.innerHTML = ""; // Clear previous partitions
+				for (let i = 0; i < totalDays; i++) {
+					const partition = document.createElement("div");
+					partition.classList.add("partition");
+					progressPartitions.appendChild(partition);
+				}
+			}
+
+			function updateProgress() {
+				const { progress, elapsedDays, totalDays } =
+					calculateProgress(birthdate);
+
+				// Update partitions
+				createPartitions(totalDays);
+
+				// Update progress bar and text
+				progressBarFill.style.width = `${progress}%`;
+				progressPercentText.textContent = `${Math.floor(progress)}%`;
+			}
+
+			updateProgress(); // Initial update
+			setInterval(updateProgress, 24 * 60 * 60 * 1000); // Update daily
+		</script>
+	</body>
+</html>
