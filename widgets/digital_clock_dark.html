@@ -1,68 +1,81 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body {
-      font-family: serif;
-      transition: background-color 0.5s, color 0.5s;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>12-Hour AM/PM Clock</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			body {
+				font-family: "Raleway", sans-serif;
+				background-color: #191919; /* Dark background for Notion Dark Mode */
+				color: #d4d4d4; /* Light text color for Notion Dark Mode */
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+			}
 
-    .clock {
-      background-color: rgb(0, 0, 0);
-      color: rgb(255, 254, 254);
-      padding-top: 45%;
-      padding-bottom: 45%;
-      padding-left: 45%;
-      padding-right: 45%;
-      font-size: 24px;
-      text-align: center;
-    }
+			.clock-container {
+				text-align: center;
+				padding: 20px;
+				background-color: #2c2c2c; /* Slightly lighter dark background for the clock container */
+				border-radius: 10px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+			}
 
-    #time {
-      font-weight: bold;
-      white-space: nowrap;
-    }
+			.display {
+				font-size: 2rem;
+				font-weight: 700;
+			}
+		</style>
+	</head>
 
-    #date {
-      margin-top: 10px;
-    }
+	<body>
+		<div class="clock-container">
+			<div class="display" id="clockDisplay">
+				<span id="hours">00</span>:<span id="minutes">00</span>:<span
+					id="seconds"
+					>00</span
+				>
+				<span id="ampm">AM</span>
+			</div>
+		</div>
 
-  </style>
-</head>
-<body>
-  <div class="clock">
-    <div id="time"></div>
-    <div id="date"></div>
-  </div>
+		<script>
+			let timer;
+			const hoursElement = document.getElementById("hours");
+			const minutesElement = document.getElementById("minutes");
+			const secondsElement = document.getElementById("seconds");
+			const ampmElement = document.getElementById("ampm");
 
-  <script>
-    function updateTime() {
-      var now = new Date();
-      var hours = now.getHours();
-      var minutes = now.getMinutes();
-      var seconds = now.getSeconds();
-      var period = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12 || 12;
-      var timeString = hours + ':' + addLeadingZero(minutes) + ':' + addLeadingZero(seconds) + ' ' + period;
+			function updateClockDisplay() {
+				const now = new Date();
+				let hours = now.getHours();
+				let minutes = now.getMinutes();
+				let seconds = now.getSeconds();
 
-      document.getElementById('time').textContent = timeString;
-      const monthName = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+				// Format time to two digits
+				hours = hours < 10 ? `0${hours}` : hours;
+				minutes = minutes < 10 ? `0${minutes}` : minutes;
+				seconds = seconds < 10 ? `0${seconds}` : seconds;
 
-      document.getElementById('date').textContent = `${monthName[now.getMonth()]} ${now.getDate()}`
-    }
+				const ampm = hours >= 12 ? "PM" : "AM";
+				hours = hours % 12 || 12; // Convert to 12-hour format
 
-    function addLeadingZero(value) {
-      return value < 10 ? '0' + value : value;
-    }
+				ampmElement.innerHTML = ampm;
+				hoursElement.innerHTML = `${hours}`;
+				minutesElement.innerHTML = `${minutes}`;
+				secondsElement.innerHTML = `${seconds}`;
+			}
 
-    // Update the time every second
-    setInterval(updateTime, 1000);
-
-  </script>
-</body>
+			// Initialize and update the clock every second
+			updateClockDisplay();
+			timer = setInterval(updateClockDisplay, 1000);
+		</script>
+	</body>
 </html>
