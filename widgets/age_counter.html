@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Age Counter</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--bg-color: #fff;
+				--text-color: #333;
+				--button-bg: #fff;
+				--button-hover: #ddd;
+				--button-border: #ccc;
+				--input-bg: #fff;
+				--divider-color: #ddd; /* Divider line color */
+				--vertical-divider-color: #ddd; /* Vertical dividers color */
+			}
+
+			[data-theme="dark"] {
+				--bg-color: #333;
+				--text-color: #f0f0f0;
+				--button-bg: #555;
+				--button-hover: #777;
+				--button-border: #666;
+				--input-bg: #555;
+				--divider-color: #666; /* Divider color for dark theme */
+				--vertical-divider-color: #666; /* Vertical dividers color for dark theme */
+			}
+
+			body {
+				font-family: "Raleway";
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+				background-color: var(--bg-color);
+				color: var(--text-color);
+				transition: background-color 0.3s, color 0.3s;
+			}
+
+			.age-counter {
+				text-align: center;
+				position: relative;
+				padding: 20px;
+				border-radius: 10px;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+				background-color: var(--bg-color);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.display {
+				font-size: 2.5rem;
+				margin-bottom: 20px;
+				display: flex;
+				justify-content: space-evenly; /* Ensures equal spacing between counters */
+				align-items: center;
+			}
+
+			.bold {
+				font-weight: bold;
+			}
+
+			/* Divider Line Styles */
+			.divider {
+				width: 100%;
+				height: 1px;
+				background-color: var(--divider-color);
+				margin: 20px 0;
+			}
+
+			/* Vertical Dividers between y, d, h, m, s */
+			.counter {
+				display: flex;
+				align-items: center;
+			}
+
+			.vertical-divider {
+				width: 4px; /* Increased width for a bolder divider */
+				height: 40px; /* Height of the divider */
+				background-color: var(--vertical-divider-color);
+				margin: 0 13px; /* Equal padding around dividers */
+			}
+
+			.theme-toggle {
+				position: absolute;
+				bottom: -40px;
+				right: 0;
+				display: flex;
+				align-items: center;
+				font-size: 0.9rem;
+			}
+
+			.slider {
+				margin-left: 10px;
+				width: 40px;
+				height: 20px;
+				position: relative;
+				background-color: var(--button-bg);
+				border: 1px solid var(--button-border);
+				border-radius: 15px;
+				cursor: pointer;
+				transition: background-color 0.3s, border-color 0.3s;
+			}
+
+			.slider:before {
+				content: "";
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: 16px;
+				height: 16px;
+				background-color: var(--text-color);
+				border-radius: 50%;
+				transition: left 0.3s, background-color 0.3s;
+			}
+
+			.slider.active {
+				background-color: var(--button-hover);
+			}
+
+			.slider.active:before {
+				left: 22px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="age-counter">
+			<div class="display" id="ageDisplay">
+				<div class="counter">
+					<span id="years">0y</span>
+					<div class="vertical-divider"></div>
+				</div>
+				<div class="counter">
+					<span id="days">0d</span>
+					<div class="vertical-divider"></div>
+				</div>
+				<div class="counter">
+					<span id="hours">0h</span>
+					<div class="vertical-divider"></div>
+				</div>
+				<div class="counter">
+					<span id="minutes">0m</span>
+					<div class="vertical-divider"></div>
+				</div>
+				<div class="counter">
+					<span id="seconds">0s</span>
+				</div>
+			</div>
+			<!-- Divider Line -->
+			<div class="divider"></div>
+			<div class="theme-toggle">
+				<div id="themeSlider" class="slider"></div>
+			</div>
+		</div>
+
+		<script>
+			let timer;
+
+			// Fixed birthdate (YYYY-MM-DD format)
+			const birthdate = "1999-11-05";
+
+			const yearsElement = document.getElementById("years");
+			const daysElement = document.getElementById("days");
+			const hoursElement = document.getElementById("hours");
+			const minutesElement = document.getElementById("minutes");
+			const secondsElement = document.getElementById("seconds");
+			const themeSlider = document.getElementById("themeSlider");
+
+			function calculateAge(birthDate) {
+				const now = new Date();
+				const birth = new Date(birthDate);
+
+				let years = now.getFullYear() - birth.getFullYear();
+				let days = now.getDate() - birth.getDate();
+				let hours = now.getHours() - birth.getHours();
+				let minutes = now.getMinutes() - birth.getMinutes();
+				let seconds = now.getSeconds() - birth.getSeconds();
+
+				if (seconds < 0) {
+					seconds += 60;
+					minutes--;
+				}
+
+				if (minutes < 0) {
+					minutes += 60;
+					hours--;
+				}
+
+				if (hours < 0) {
+					hours += 24;
+					days--;
+				}
+
+				if (days < 0) {
+					const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+					days += lastMonth.getDate();
+					years--;
+				}
+
+				return {
+					years,
+					days,
+					hours,
+					minutes,
+					seconds,
+				};
+			}
+
+			function updateAgeDisplay() {
+				const age = calculateAge(birthdate);
+				yearsElement.innerHTML = `${age.years}y`;
+				daysElement.innerHTML = `${age.days}d`;
+				hoursElement.innerHTML = `${age.hours}h`;
+				minutesElement.innerHTML = `${age.minutes}m`;
+				secondsElement.innerHTML = `${age.seconds}s`;
+			}
+
+			function toggleTheme() {
+				const isDark =
+					document.documentElement.getAttribute("data-theme") === "dark";
+				document.documentElement.setAttribute(
+					"data-theme",
+					isDark ? "light" : "dark"
+				);
+				themeSlider.classList.toggle("active", !isDark);
+			}
+
+			// Initial update and every second after that
+			updateAgeDisplay();
+			timer = setInterval(updateAgeDisplay, 1000); // Update every second
+
+			themeSlider.addEventListener("click", toggleTheme);
+
+			// Initialize theme
+			document.documentElement.setAttribute("data-theme", "light");
+		</script>
+	</body>
+</html>
