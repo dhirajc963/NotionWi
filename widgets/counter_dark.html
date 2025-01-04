@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Minimalist Timer</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--bg-color: #191919;
+				--text-color: #f0f0f0;
+				--button-bg: #555;
+				--button-hover: #777;
+				--button-border: #666;
+				--divider-color: #666;
+				--counter-bg: #222;
+				--shadow-color: rgba(0, 0, 0, 0.4);
+				--overlay-bg: rgba(0, 0, 0, 0.8);
+			}
+
+			body {
+				font-family: "Raleway", sans-serif;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				height: 100vh;
+				margin: 0;
+				background-color: var(--bg-color);
+				color: var(--text-color);
+				transition: background-color 0.3s, color 0.3s;
+			}
+
+			.timer {
+				text-align: center;
+				position: relative;
+				padding: 20px;
+				border-radius: 10px;
+				box-shadow: 0 4px 8px var(--shadow-color);
+				background-color: var(--counter-bg);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				width: 220px;
+			}
+
+			.display {
+				font-size: 2.5rem;
+				margin-bottom: 15px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.controls {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 15px;
+			}
+
+			.adjust-controls {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 10px;
+			}
+
+			.increment-label {
+				font-size: 1.2rem;
+				cursor: pointer;
+				padding: 5px 10px;
+				border: 1px solid var(--button-border);
+				border-radius: 5px;
+				background-color: var(--button-bg);
+				transition: background-color 0.3s;
+			}
+
+			.increment-label:hover {
+				background-color: var(--button-hover);
+			}
+
+			.arrows {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.arrow {
+				font-size: 1.5rem;
+				cursor: pointer;
+				padding: 5px;
+				transition: background-color 0.3s;
+				border: none; /* Remove the outline */
+				border-radius: 50%; /* Keep the circle shape */
+			}
+
+			.arrow:hover {
+				background-color: var(--button-hover);
+			}
+
+			.action-buttons {
+				display: flex;
+				gap: 10px;
+			}
+
+			button {
+				padding: 10px 20px;
+				font-size: 1rem;
+				background-color: var(--button-bg);
+				border: 1px solid var(--button-border);
+				color: var(--text-color);
+				cursor: pointer;
+				border-radius: 5px;
+				transition: background-color 0.3s;
+			}
+
+			button:hover {
+				background-color: var(--button-hover);
+			}
+
+			.overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: var(--overlay-bg);
+				color: red;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				font-size: 2rem;
+				font-weight: bold;
+				visibility: hidden;
+				opacity: 0;
+				transition: visibility 0s, opacity 0.3s;
+			}
+
+			.overlay.visible {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			.overlay button {
+				margin-top: 20px;
+				background-color: red;
+				color: var(--text-color);
+			}
+
+			.overlay button:hover {
+				background-color: darkred;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="timer">
+			<div class="display">
+				<span id="hours" style="display: none">00:</span
+				><span id="minutes">00</span>:<span id="seconds">00</span>
+			</div>
+			<div class="controls">
+				<div class="adjust-controls">
+					<div class="arrow" id="downArrow">&#x25BC;</div>
+					<div class="increment-label" id="incrementLabel">5</div>
+					<div class="arrow" id="upArrow">&#x25B2;</div>
+				</div>
+				<div class="action-buttons">
+					<button id="startStopButton">Start</button>
+					<button id="resetButton">Reset</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="overlay" id="overlay">
+			<div>Time's up!</div>
+			<button id="resetOverlayButton">Reset Timer</button>
+		</div>
+
+		<script>
+			let timer;
+			let isRunning = false;
+			let totalTime = 0;
+			const increments = [5, 10, 15, 30, 60, 1];
+			let currentIncrementIndex = 0;
+
+			const hoursElement = document.getElementById("hours");
+			const minutesElement = document.getElementById("minutes");
+			const secondsElement = document.getElementById("seconds");
+			const incrementLabel = document.getElementById("incrementLabel");
+			const upArrow = document.getElementById("upArrow");
+			const downArrow = document.getElementById("downArrow");
+			const startStopButton = document.getElementById("startStopButton");
+			const resetButton = document.getElementById("resetButton");
+			const overlay = document.getElementById("overlay");
+			const resetOverlayButton = document.getElementById("resetOverlayButton");
+
+			function updateDisplay() {
+				const hours = Math.floor(totalTime / 3600);
+				const minutes = Math.floor((totalTime % 3600) / 60);
+				const seconds = totalTime % 60;
+
+				if (hours > 0) {
+					hoursElement.style.display = "inline";
+					hoursElement.textContent = hours < 10 ? `0${hours}:` : `${hours}:`;
+				} else {
+					hoursElement.style.display = "none";
+				}
+
+				minutesElement.textContent = minutes < 10 ? `0${minutes}` : minutes;
+				secondsElement.textContent = seconds < 10 ? `0${seconds}` : seconds;
+			}
+
+			function toggleIncrement() {
+				currentIncrementIndex = (currentIncrementIndex + 1) % increments.length;
+				incrementLabel.textContent = increments[currentIncrementIndex];
+			}
+
+			function adjustTime(amount) {
+				totalTime = Math.max(0, totalTime + amount);
+				updateDisplay();
+			}
+
+			function startTimer() {
+				timer = setInterval(() => {
+					if (totalTime > 0) {
+						totalTime--;
+						updateDisplay();
+					} else {
+						clearInterval(timer);
+						isRunning = false;
+						startStopButton.textContent = "Start";
+						showOverlay();
+					}
+				}, 1000);
+			}
+
+			function stopTimer() {
+				clearInterval(timer);
+			}
+
+			function resetTimer() {
+				stopTimer();
+				totalTime = 0;
+				updateDisplay();
+				if (isRunning) {
+					isRunning = false;
+					startStopButton.textContent = "Start";
+				}
+			}
+
+			function showOverlay() {
+				overlay.classList.add("visible");
+			}
+
+			function hideOverlay() {
+				overlay.classList.remove("visible");
+			}
+
+			incrementLabel.addEventListener("click", toggleIncrement);
+			upArrow.addEventListener("click", () =>
+				adjustTime(increments[currentIncrementIndex] * 60)
+			);
+			downArrow.addEventListener("click", () =>
+				adjustTime(-increments[currentIncrementIndex] * 60)
+			);
+
+			startStopButton.addEventListener("click", () => {
+				if (isRunning) {
+					stopTimer();
+					startStopButton.textContent = "Start";
+				} else {
+					if (totalTime > 0) {
+						startTimer();
+						startStopButton.textContent = "Stop";
+						isRunning = true;
+					}
+				}
+			});
+
+			resetButton.addEventListener("click", resetTimer);
+			resetOverlayButton.addEventListener("click", () => {
+				resetTimer();
+				hideOverlay();
+			});
+		</script>
+	</body>
+</html>
