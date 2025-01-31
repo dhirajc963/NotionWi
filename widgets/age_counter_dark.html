@@ -10,16 +10,12 @@
 		/>
 		<style>
 			:root {
-				--bg-color: #191919; /* Dark background */
-				--text-color: #d4d4d4; /* Light text color */
-				--button-bg: #555;
-				--button-hover: #777;
-				--button-border: #666;
-				--input-bg: #555;
+				--bg-color: #191919;
+				--text-color: #d4d4d4;
 				--divider-color: #666;
 				--vertical-divider-color: #666;
-				--counter-bg: #222; /* Dark background for the counter section */
-				--shadow-color: rgba(0, 0, 0, 0.4); /* Shadow effect */
+				--counter-bg: #222;
+				--shadow-color: rgba(0, 0, 0, 0.4);
 			}
 
 			body {
@@ -32,7 +28,6 @@
 				margin: 0;
 				background-color: var(--bg-color);
 				color: var(--text-color);
-				transition: background-color 0.3s, color 0.3s;
 			}
 
 			.age-counter {
@@ -40,8 +35,8 @@
 				position: relative;
 				padding: 20px;
 				border-radius: 10px;
-				background-color: var(--counter-bg); /* Counter background */
-				box-shadow: 0 4px 8px var(--shadow-color); /* Subtle shadow */
+				background-color: var(--counter-bg);
+				box-shadow: 0 4px 8px var(--shadow-color);
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -53,17 +48,6 @@
 				display: flex;
 				justify-content: space-evenly;
 				align-items: center;
-			}
-
-			.bold {
-				font-weight: bold;
-			}
-
-			.divider {
-				width: 100%;
-				height: 1px;
-				background-color: var(--divider-color);
-				margin: 20px 0;
 			}
 
 			.counter {
@@ -88,77 +72,80 @@
 					<div class="vertical-divider"></div>
 				</div>
 				<div class="counter">
+					<span id="months">0m</span>
+					<div class="vertical-divider"></div>
+				</div>
+				<div class="counter">
 					<span id="days">0d</span>
 					<div class="vertical-divider"></div>
 				</div>
 				<div class="counter">
 					<span id="hours">0h</span>
-					<div class="vertical-divider"></div>
-				</div>
-				<div class="counter">
-					<span id="minutes">0m</span>
-					<div class="vertical-divider"></div>
-				</div>
-				<div class="counter">
-					<span id="seconds">0s</span>
 				</div>
 			</div>
-			<div class="divider"></div>
 		</div>
 
 		<script>
-			let timer;
 			const birthdate = "1999-11-05T00:00:00-05:00";
 			const yearsElement = document.getElementById("years");
+			const monthsElement = document.getElementById("months");
 			const daysElement = document.getElementById("days");
 			const hoursElement = document.getElementById("hours");
-			const minutesElement = document.getElementById("minutes");
-			const secondsElement = document.getElementById("seconds");
 
-			function calculateAge(birthDate) {
+			function calculateAgeWithMonths(birthDate) {
 				const now = new Date();
 				const birth = new Date(birthDate);
+
+				// Calculate full years
 				let years = now.getFullYear() - birth.getFullYear();
-				let days = now.getDate() - birth.getDate();
-				let hours = now.getHours() - birth.getHours();
-				let minutes = now.getMinutes() - birth.getMinutes();
-				let seconds = now.getSeconds() - birth.getSeconds();
 
-				if (seconds < 0) {
-					seconds += 60;
-					minutes--;
-				}
-
-				if (minutes < 0) {
-					minutes += 60;
-					hours--;
-				}
-
-				if (hours < 0) {
-					hours += 24;
-					days--;
-				}
-
-				if (days < 0) {
-					const lastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-					days += lastMonth.getDate();
+				// Adjust if the birthday hasn't occurred yet this year
+				const currentYearBirthday = new Date(
+					now.getFullYear(),
+					birth.getMonth(),
+					birth.getDate()
+				);
+				if (now < currentYearBirthday) {
 					years--;
 				}
 
-				return { years, days, hours, minutes, seconds };
+				// Calculate full months after last full year
+				let months = now.getMonth() - birth.getMonth();
+				if (months < 0) {
+					months += 12;
+				}
+
+				// Calculate remaining days after the last month
+				const lastMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+				const lastMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+				const daysInLastMonth = lastMonthEnd.getDate();
+
+				let days = now.getDate() - birth.getDate();
+				if (days < 0) {
+					days += daysInLastMonth;
+					months--;
+					if (months < 0) {
+						months = 11;
+						years--;
+					}
+				}
+
+				// Calculate hours
+				const hours = now.getHours();
+
+				return { years, months, days, hours };
 			}
 
 			function updateAgeDisplay() {
-				const age = calculateAge(birthdate);
-				yearsElement.innerHTML = `${age.years}y`;
-				daysElement.innerHTML = `${age.days}d`;
-				hoursElement.innerHTML = `${age.hours}h`;
-				minutesElement.innerHTML = `${age.minutes}m`;
-				secondsElement.innerHTML = `${age.seconds}s`;
+				const age = calculateAgeWithMonths(birthdate);
+				yearsElement.textContent = `${age.years}y`;
+				monthsElement.textContent = `${age.months}m`;
+				daysElement.textContent = `${age.days}d`;
+				hoursElement.textContent = `${age.hours}h`;
 			}
 
 			updateAgeDisplay();
-			timer = setInterval(updateAgeDisplay, 1000);
+			setInterval(updateAgeDisplay, 1000); // Update every second
 		</script>
 	</body>
 </html>
